@@ -1,0 +1,948 @@
+{
+	"info": {
+		"_postman_id": "acbadc5e-0cb2-478b-bd29-6fab19f4998c",
+		"name": "Printer API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21460444"
+	},
+	"item": [
+		{
+			"name": "Health check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"console.log(pm.response.status)",
+							"",
+							"pm.test(\"Status should be OK\", ()=>{",
+							"    pm.expect(pm.response.status).eql(\"OK\")",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get printers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"// console.log(pm.response.json().data)",
+							"console.log(\"Totoal number of printer is \"+pm.response.json().meta.total)",
+							"",
+							"const printerData = pm.response.json().data",
+							"let printer = pm.response.json().data[printerData.length-1]",
+							"",
+							"pm.collectionVariables.set(\"guid\", printer.guid);",
+							"console.log(\"set guid as \" + printer.guid)",
+							"pm.collectionVariables.set(\"timezone\", printer.timezone);",
+							"console.log(\"set timezone as \" + printer.timezone)",
+							"pm.collectionVariables.set(\"restaurantId\", printer.restaurantId);",
+							"console.log(\"set restaurantId as \" + printer.restaurantId)",
+							"pm.collectionVariables.set(\"total\", pm.response.json().meta.total);",
+							"console.log(\"set total number of restaurant as \" + pm.response.json().meta.total)",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"23 6 0 0 0 0 0 0 0 \",\n    \"printerMAC\": \"00:11:e5:06:04:ff\",\n    \"uniqueID\": \"Star1\",\n    \"statusCode\": \"200%20OK\",\n    \"jobToken\": \"PrintJob1\",\n    \"printingInProgress\": true,\n    \"clientAction\": null\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/printers",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new printer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", ()=>{",
+							"    pm.response.to.have.status(201)",
+							"})",
+							"const printer = pm.response.json()",
+							"",
+							"pm.collectionVariables.set(\"guid\", printer.guid);",
+							"console.log(\"Add printer with guid \" + printer.guid)",
+							"pm.collectionVariables.set(\"restaurantId\", printer.restaurantId);",
+							"console.log(\"Add printer with restaurantId \" + printer.restaurantId)",
+							"pm.collectionVariables.set(\"label\", printer.label);",
+							"console.log(\"Add printer with label \" + printer.label)",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"label\": \"{{$randomFullName}}\",\n  \"restaurantId\": \"{{restaurantId}}\",\n  \"timezone\": \"{{timezone}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/printers",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get printers total number updated",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"// console.log(pm.response.json().data)",
+							"console.log(\"Totoal number of printer is \"+pm.response.json().meta.total)",
+							"",
+							"pm.test(\"Total number should be updated\",()=>{",
+							"    pm.expect(pm.response.json().meta.total).eql(pm.collectionVariables.get(\"total\")+1)",
+							"})",
+							"",
+							"console.log(\"total number of printer is \"+ pm.response.json().meta.total)",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"23 6 0 0 0 0 0 0 0 \",\n    \"printerMAC\": \"00:11:e5:06:04:ff\",\n    \"uniqueID\": \"Star1\",\n    \"statusCode\": \"200%20OK\",\n    \"jobToken\": \"PrintJob1\",\n    \"printingInProgress\": true,\n    \"clientAction\": null\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/printers",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get printer with guid status should be pending",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"pm.test(\"Status is PENDING\", ()=>{",
+							"    pm.expect(pm.response.json().status).eql(\"PENDING\")",
+							"})",
+							"",
+							"console.log(\"get printer guid \" + pm.response.json().guid)",
+							"console.log(\"get printer restaurantId \" + pm.response.json().restaurantId)",
+							"console.log(\"get printer label \" + pm.response.json().label)",
+							"console.log(\"status of printer is \" + pm.response.json().status )"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/v1/printers/{{guid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers",
+						"{{guid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patch printer categories with guid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", ()=>{",
+							"    pm.response.to.have.status(204)",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"categories\": [\n    {\n      \"id\": \"{{$randomBitcoin}}\",\n      \"name\": \"{{$randomLastName}}\"\n    }\n  ],\n  \"label\": \"{{$randomFullName}}\",\n  \"timezone\": \"{{timezone}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/printers/{{guid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers",
+						"{{guid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get printer with guid when categories updated",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"console.log(\"get categories id \" + pm.response.json().categories[0].id)",
+							"console.log(\"get categories name \" + pm.response.json().categories[0].name)",
+							"console.log(\"get label \" +pm.response.json().label)",
+							"",
+							"pm.test(\"Response updated category id\", ()=>{",
+							"    pm.expect(pm.response.json().categories[0].id).not.to.eql(null);",
+							"})",
+							"",
+							"pm.test(\"Response updated category name\", ()=>{",
+							"    pm.expect(pm.response.json().categories[0].name).not.to.eql(null);",
+							"})",
+							"",
+							"pm.test(\"Response updated label\", ()=>{",
+							"    pm.expect(pm.response.json().label).not.to.eql(pm.collectionVariables.get(\"label\"));",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/v1/printers/{{guid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers",
+						"{{guid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patch printer categories with guid and restaurantId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", ()=>{",
+							"    pm.response.to.have.status(204)",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"categories\": [\n    {\n      \"id\": \"{{$randomBitcoin}}\",\n      \"name\": \"{{$randomLastName}}\"\n    }\n  ],\n  \"label\": \"{{$randomFullName}}\",\n  \"timezone\": \"{{timezone}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/restaurants/{{restaurantId}}/printers/{{guid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"restaurants",
+						"{{restaurantId}}",
+						"printers",
+						"{{guid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get printer with guid restaurantId  when categories updated",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"console.log(\"get categories id \" + pm.response.json().categories[0].id)",
+							"console.log(\"get categories name \" + pm.response.json().categories[0].name)",
+							"console.log(\"get label \" +pm.response.json().label)",
+							"",
+							"pm.test(\"Response updated category id\", ()=>{",
+							"    pm.expect(pm.response.json().categories[0].id).not.to.eql(pm.collectionVariables.get(\"categoriesId\"));",
+							"})",
+							"pm.collectionVariables.set(\"categoriesId\", pm.response.json().categories[0].id);",
+							"",
+							"pm.test(\"Response updated category name\", ()=>{",
+							"    pm.expect(pm.response.json().categories[0].name).not.to.eql(pm.collectionVariables.get(\"name\"));",
+							"})",
+							"pm.collectionVariables.set(\"categoriesName\", pm.response.json().categories[0].name);",
+							"",
+							"pm.test(\"Response updated label\", ()=>{",
+							"    pm.expect(pm.response.json().label).not.to.eql(pm.collectionVariables.get(\"label\"));",
+							"})",
+							"pm.collectionVariables.set(\"label\", pm.response.json().label);",
+							"",
+							"setTimeout(function(){}, 1000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/v1/printers/{{guid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers",
+						"{{guid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POS printer token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"pm.collectionVariables.set(\"posToken\", pm.response.json().data.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"demo@superbexperience.com\",\n    \"password\": \"123@superb\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.superb.community/signin-pos",
+					"protocol": "https",
+					"host": [
+						"api",
+						"superb",
+						"community"
+					],
+					"path": [
+						"signin-pos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Printer job request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{posToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"order\": {\n    \"items\": [\n      {\n        \"categoryId\": \"{{categoriesId}}\",\n        \"description\": \"{{categoriesName}}\",\n        \"observations\": \"string\",\n        \"quantity\": 1,\n        \"addOnLineItems\": [\n          {\n            \"productName\": \"1234\",\n            \"quantity\": 1\n          }\n        ]\n      }\n    ],\n    \"tableName\": \"1\",\n    \"pickupTime\": \"{{$isoTimestamp}}\",\n    \"pickupType\": \"stay\",\n    \"comment\": \"{{$randomLoremSentence}}\"\n  },\n  \"restaurantId\": \"{{restaurantId}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.superb.community/printer-api/v1/jobrequests",
+					"protocol": "https",
+					"host": [
+						"api",
+						"superb",
+						"community"
+					],
+					"path": [
+						"printer-api",
+						"v1",
+						"jobrequests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Starprinter Integration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"console.log(pm.response.json().jobToken)",
+							"",
+							"pm.collectionVariables.set(\"jobToken\", pm.response.json().jobToken);",
+							"pm.collectionVariables.set(\"mediaType\", pm.response.json().mediaTypes[4]);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "User-Agent",
+						"value": "CloudPRNT/3.0 mC-Print2/3.6",
+						"type": "text"
+					},
+					{
+						"key": "X-Star-Mac",
+						"value": "00:11:62:1c:48:d8",
+						"type": "text"
+					},
+					{
+						"key": "X-Star-Serial-Number",
+						"value": "2600220040601098",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"23 6 0 0 0 0 0 0 0 \",\n    \"printerMAC\": \"00:11:e5:06:04:ff\",\n    \"uniqueID\": \"Star1\",\n    \"statusCode\": \"200%20OK\",\n    \"jobToken\": \"PrintJob1\",\n    \"printingInProgress\": false,\n    \"clientAction\": null\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/integrations/starprinter/{{guid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"integrations",
+						"starprinter",
+						"{{guid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Starprinter Integration get print job",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Star-Paper-Width",
+						"value": "80",
+						"type": "text"
+					},
+					{
+						"key": "X-Star-Mac",
+						"value": "00:11:62:1c:48:d8",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/v1/integrations/starprinter/{{guid}}?type={{mediaType}}&X-Star-Paper-Width=80&token={{jobToken}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"integrations",
+						"starprinter",
+						"{{guid}}"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "{{mediaType}}"
+						},
+						{
+							"key": "X-Star-Paper-Width",
+							"value": "80"
+						},
+						{
+							"key": "token",
+							"value": "{{jobToken}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get printer status should be available",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"pm.test(\"Status is AVAILABLE\", ()=>{",
+							"    pm.expect(pm.response.json().status).eql(\"AVAILABLE\")",
+							"})",
+							"",
+							"console.log(\"status of printer is \" + pm.response.json().status )"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/v1/printers/{{guid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers",
+						"{{guid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get printer jobs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"pm.collectionVariables.set(\"totalOrder\", pm.response.json().meta.total);",
+							"setTimeout(function(){}, 1000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/v1/printers/{{guid}}/jobs",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers",
+						"{{guid}}",
+						"jobs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post printer job order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", ()=>{",
+							"    pm.response.to.have.status(201)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"order\": {\n    \"comment\": \"{{$randomLoremSentence}}\",\n    \"items\": [\n      {\n        \"addOnLineItems\": [\n          {\n            \"productName\": \"{{$randomCompanyName}}\",\n            \"quantity\": 0\n          }\n        ],\n        \"categoryId\": \"{{categoriesId}}\",\n        \"comment\": \"{{$randomLoremText}}\",\n        \"description\": \"{{$randomLoremWords}}\",\n        \"observations\": \"{{$randomLoremWord}}\",\n        \"quantity\": 5,\n        \"segment\": \"FIRE\"\n      }\n    ],\n    \"pickupTime\": \"{{$timestamp}}\",\n    \"pickupType\": \"{{$randomMimeType}}\",\n    \"tableName\": \"{{$randomFirstName}}\"\n  },\n  \"template\": \"{{$randomLoremWord}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/printers/{{guid}}/jobs/orders",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers",
+						"{{guid}}",
+						"jobs",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get printer jobs order updated",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=>{",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"pm.test(\"Total number of order should be updated\",()=>{",
+							"    pm.expect(pm.response.json().meta.total).eql(pm.collectionVariables.get(\"totalOrder\")+1)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/v1/printers/{{guid}}/jobs",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers",
+						"{{guid}}",
+						"jobs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete printer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", ()=>{",
+							"    pm.response.to.have.status(204)",
+							"})",
+							"",
+							"console.log(\"Delete printer with guid \" + pm.collectionVariables.get(\"guid\"))",
+							"",
+							"pm.test(\"Delete printer successfully\", ()=>{",
+							"    pm.sendRequest(pm.collectionVariables.get(\"base_url\")+\"/v1/printers/\"+ pm.collectionVariables.get(\"guid\"), function (err, response) {",
+							"        pm.expect(response.code).eql(404)",
+							"        console.log(response)",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/v1/printers/{{guid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"printers",
+						"{{guid}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://printer.superb.community",
+			"type": "string"
+		},
+		{
+			"key": "guid",
+			"value": ""
+		},
+		{
+			"key": "timezone",
+			"value": ""
+		},
+		{
+			"key": "restaurantId",
+			"value": ""
+		},
+		{
+			"key": "id",
+			"value": ""
+		},
+		{
+			"key": "categoriesId",
+			"value": ""
+		},
+		{
+			"key": "categoriesName",
+			"value": ""
+		},
+		{
+			"key": "label",
+			"value": ""
+		},
+		{
+			"key": "total",
+			"value": ""
+		},
+		{
+			"key": "totalOrder",
+			"value": ""
+		},
+		{
+			"key": "jobToken",
+			"value": ""
+		},
+		{
+			"key": "mediaType",
+			"value": ""
+		},
+		{
+			"key": "posToken",
+			"value": ""
+		}
+	]
+}
